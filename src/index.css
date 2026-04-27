@@ -41,6 +41,7 @@ body {
   display: flex;
   flex-direction: column;
   z-index: 50;
+  overflow-y: auto;
 }
 
 .logo {
@@ -268,4 +269,50 @@ body {
   font-size: 14px;
   color: #a78bfa;
   overflow-x: auto;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto;
+  }
+  .dark-theme {
+    flex-direction: column;
+    height: auto;
+  }
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .logo-sub {
+    margin-bottom: 24px;
+  }
+  .nav-menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .nav-button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  .main-content {
+    padding: 20px;
+    overflow-y: visible;
+  }
+  .demo-panel {
+    padding: 24px;
+  }
+  .demo-panel h2 {
+    font-size: 26px;
+  }
+  .sensor-grid {
+    grid-template-columns: 1fr;
+  }
+  .interactive-box {
+    height: 250px;
+  }
 }

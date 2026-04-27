@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDrag } from '../hooks';
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { motion, useMotionValue, useSpring } from 'motion/react';
 
 export const DragGesture = ({ children, boundary, style, className }) => {
   const x = useMotionValue(0);

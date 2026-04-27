@@ -1,20 +1,46 @@
 {
-  "name": "testproject",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@deekshaaa/kinetic-ui",
+  "version": "0.2.0",
+  "description": "An advanced, high-performance gesture library for React with contactless MediaPipe hand tracking.",
+  "keywords": [
+    "react",
+    "gestures",
+    "motion",
+    "spring",
+    "swipe",
+    "mediapipe",
+    "hand tracking"
+  ],
+  "author": "Deekshaaa",
+  "license": "MIT",
   "type": "module",
+  "main": "dist/kinetic-ui.umd.js",
+  "module": "dist/kinetic-ui.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/kinetic-ui.es.js",
+      "require": "./dist/kinetic-ui.umd.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "motion": ">=12.0.0"
+  },
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.34",
-    "framer-motion": "^12.38.0",
-    "lucide-react": "^1.7.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "lucide-react": "^1.7.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
@@ -25,6 +51,8 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "vite": "^8.0.1"
   }
 }

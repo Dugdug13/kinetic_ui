@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useSpring, useMotionValue } from 'framer-motion';
+import { motion, AnimatePresence, useSpring, useMotionValue } from 'motion/react';
 import { useSwipe, useDrag, useTap, usePinch, useRotate, useSensor, useContactless, useScroll } from './hooks';
 
 export default function App() {
@@ -97,15 +97,15 @@ const DragDemo = () => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   // Elegant rubberbanding physics
-  const springX = useSpring(x, { stiffness: 400, damping: 25 });
-  const springY = useSpring(y, { stiffness: 400, damping: 25 });
+  const springX = useSpring(x, { stiffness: 800, damping: 35 });
+  const springY = useSpring(y, { stiffness: 800, damping: 35 });
   const scale = useMotionValue(1);
 
   const bind = useDrag(({ active, offset }) => {
     x.set(offset.x);
     y.set(offset.y);
     scale.set(active ? 1.1 : 1);
-  }, { boundary: { left: -150, right: 150, top: -100, bottom: 100 } });
+  });
 
   return (
     <div className="demo-panel">
@@ -208,7 +208,7 @@ const SensorDemo = () => {
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
 
-  const { requestPermission, permissionGranted } = useSensor((sensorData) => {
+  const { requestPermission, permissionGranted, isSupported, error } = useSensor((sensorData) => {
     setData({
       alpha: Math.round(sensorData.alpha),
       beta: Math.round(sensorData.beta),
@@ -223,8 +223,21 @@ const SensorDemo = () => {
       <h2>useSensor</h2>
       <p>Streams device orientation data natively. Note: Requires HTTPS on mobile.</p>
       
+      {error && (
+        <div className="status-badge" style={{ borderColor: '#ef4444', color: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', marginBottom: '15px' }}>
+          {error}
+        </div>
+      )}
+
       {!permissionGranted ? (
-        <button className="primary-btn" onClick={requestPermission}>Request Sensor Permission</button>
+        <button 
+          className="primary-btn" 
+          onClick={requestPermission}
+          disabled={!isSupported}
+          style={{ opacity: isSupported ? 1 : 0.5 }}
+        >
+          {isSupported ? "Request Sensor Permission" : "Sensors Not Supported"}
+        </button>
       ) : (
         <div className="sensor-grid">
           <div className="sensor-card">
@@ -277,28 +290,34 @@ const ContactlessDemo = () => {
     
     // Listen for advanced gestures
     if (results.semanticGesture) {
-       setSemanticAction(results.semanticGesture);
-       setTimeout(() => setSemanticAction(null), 2000);
+       setSemanticAction(
+          results.semanticGesture === 'PRANAM' 
+            ? "ASALAM WALEKUM LYARI" 
+            : `${results.semanticGesture} Triggered!`
+       );
+       setTimeout(() => setSemanticAction(null), 2500);
     }
 
     if (results.landmarks && results.landmarks.length > 0) {
-      setDebugText("Hand detected!");
+      setDebugText(`${results.landmarks.length} Hand(s) detected`);
       
-      const hand = results.landmarks[0];
-      const indexFinger = hand[8]; // Index finger tip
-      
-      if (indexFinger) {
-        x.set(-(indexFinger.x - 0.5) * 640);
-        y.set((indexFinger.y - 0.5) * 480);
+      // Draw all hands
+      for (let i = 0; i < results.landmarks.length; i++) {
+        const hand = results.landmarks[i];
         
-        canvasCtx.fillStyle = '#3b82f6';
-        canvasCtx.beginPath();
-        canvasCtx.arc(indexFinger.x * canvasRef.current.width, indexFinger.y * canvasRef.current.height, 10, 0, 2 * Math.PI);
-        canvasCtx.fill();
-      }
+        // Drive UI with the first hand's index finger natively
+        if (i === 0 && hand[8]) {
+          x.set(-(hand[8].x - 0.5) * 640);
+          y.set((hand[8].y - 0.5) * 480);
+          
+          canvasCtx.fillStyle = '#3b82f6';
+          canvasCtx.beginPath();
+          canvasCtx.arc(hand[8].x * canvasRef.current.width, hand[8].y * canvasRef.current.height, 10, 0, 2 * Math.PI);
+          canvasCtx.fill();
+        }
 
-      for (const landmarks of results.landmarks) {
-        for (const lm of landmarks) {
+        // Draw joints for all detected hands
+        for (const lm of hand) {
            canvasCtx.fillStyle = '#60a5fa';
            canvasCtx.beginPath();
            canvasCtx.arc(lm.x * canvasRef.current.width, lm.y * canvasRef.current.height, 3, 0, 2 * Math.PI);
@@ -320,14 +339,14 @@ const ContactlessDemo = () => {
   return (
     <div className="demo-panel">
       <h2>useContactless (MediaPipe)</h2>
-      <p>Cooking with wet hands? Skip ads without touching the screen. Try opening your palm, making a fist, sweeping left/right quickly, or double-palming!</p>
+      <p>Cooking with wet hands? Skip ads without touching the screen. Try opening your palm, making a fist, sweeping left/right quickly, double-palming, or folding your hands in Pranam.</p>
       
       <div className="status-flex">
         {!isReady && <div className="status-badge pulse-red">Loading ML Model...</div>}
         {isReady && <div className="status-badge">{debugText}</div>}
         {semanticAction && (
            <div className="status-badge pulse-red" style={{ borderColor: '#10b981', color: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', animation: 'none' }}>
-              🎯 {semanticAction} Triggered!
+              {semanticAction}
            </div>
         )}
       </div>
